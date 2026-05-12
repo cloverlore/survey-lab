@@ -1,5 +1,18 @@
 const $ = (id) => document.getElementById(id);
 
+function makeCollapsible(sectionId) {
+  const section = $(sectionId);
+  if (section.classList.contains("collapsible")) return;
+  section.classList.add("collapsible");
+  section.querySelector("h2").addEventListener("click", () =>
+    section.classList.toggle("collapsed")
+  );
+}
+
+function collapseSection(sectionId) {
+  $(sectionId).classList.add("collapsed");
+}
+
 const state = {
   fileName: null,
   rows: [],
@@ -52,6 +65,7 @@ function renderPreview() {
   ].join("");
   $("preview-table").innerHTML = html;
   $("preview-section").hidden = false;
+  makeCollapsible("preview-section");
 }
 
 function renderColumnControls() {
@@ -83,6 +97,7 @@ function renderColumnControls() {
 
   $("confirm-columns").addEventListener("click", onConfirmColumns);
   $("columns-section").hidden = false;
+  makeCollapsible("columns-section");
 }
 
 function onConfirmColumns() {
@@ -180,6 +195,8 @@ function renderCleaning() {
     .join("");
   state.ratingColumns.forEach((col, idx) => bindCleaningCard(col, idx));
   $("cleaning-section").hidden = false;
+  makeCollapsible("cleaning-section");
+  collapseSection("columns-section");
   renderComparison();
 }
 
@@ -281,6 +298,7 @@ function renderComparison() {
   }
   renderComparisonPickers();
   $("comparison-section").hidden = false;
+  makeCollapsible("comparison-section");
 }
 
 function renderComparisonPickers() {
@@ -404,12 +422,26 @@ async function onRunAnalysis() {
 
   const sizeCheck = checkSampleSizes(payload);
   if (sizeCheck.tooSmall.length > 0) {
-    const list = sizeCheck.tooSmall.map((s) => `${s.label} (n=${s.n})`).join(", ");
-    const ok = confirm(
-      `Very small sample size detected: ${list}.\n\n` +
-        `Statistical tests are unreliable below n=10. Continue anyway?`
-    );
-    if (!ok) return;
+    if (payload.type === "between-groups") {
+      const choice = await showSmallSampleDialog(sizeCheck.tooSmall);
+      if (choice === "cancel") return;
+      if (choice === "exclude") {
+        for (const { label } of sizeCheck.tooSmall) {
+          delete payload.groups[label];
+        }
+        if (Object.keys(payload.groups).length < 2) {
+          alert("After excluding small categories, fewer than 2 groups remain. Please adjust your selection.");
+          return;
+        }
+      }
+    } else {
+      const list = sizeCheck.tooSmall.map((s) => `${s.label} (n=${s.n})`).join(", ");
+      const ok = confirm(
+        `Very small sample size detected: ${list}.\n\n` +
+          `Statistical tests are unreliable below n=10. Continue anyway?`
+      );
+      if (!ok) return;
+    }
   }
 
   const btn = $("run-analysis");
@@ -437,6 +469,7 @@ async function onRunAnalysis() {
 
 function renderResults(payload, result) {
   $("results-section").hidden = false;
+  makeCollapsible("results-section");
   const div = $("results");
 
   if (result.error) {
@@ -785,6 +818,40 @@ function renderCharts(payload, result) {
         height: 1000,
       });
     });
+  });
+}
+
+function showSmallSampleDialog(tooSmall) {
+  return new Promise((resolve) => {
+    const dialog = document.getElementById("small-sample-dialog");
+    const list = document.getElementById("ssd-list");
+    list.innerHTML = tooSmall
+      .map((s) => `<li>${escapeHtml(s.label)} (n=${s.n})</li>`)
+      .join("");
+
+    function cleanup(result) {
+      dialog.removeEventListener("close", onClose);
+      btnExclude.removeEventListener("click", onExclude);
+      btnInclude.removeEventListener("click", onInclude);
+      btnCancel.removeEventListener("click", onCancel);
+      resolve(result);
+    }
+
+    const btnExclude = document.getElementById("ssd-exclude");
+    const btnInclude = document.getElementById("ssd-include");
+    const btnCancel = document.getElementById("ssd-cancel");
+
+    function onExclude() { dialog.close(); cleanup("exclude"); }
+    function onInclude() { dialog.close(); cleanup("include"); }
+    function onCancel()  { dialog.close(); cleanup("cancel"); }
+    function onClose()   { cleanup("cancel"); }
+
+    btnExclude.addEventListener("click", onExclude);
+    btnInclude.addEventListener("click", onInclude);
+    btnCancel.addEventListener("click", onCancel);
+    dialog.addEventListener("close", onClose);
+
+    dialog.showModal();
   });
 }
 
@@ -1156,3 +1223,5 @@ function escapeHtml(s) {
     ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])
   );
 }
+
+makeCollapsible("upload-section");

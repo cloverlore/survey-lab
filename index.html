@@ -60,6 +60,18 @@
     </section>
   </main>
 
+  <dialog id="small-sample-dialog" aria-labelledby="ssd-title">
+    <h3 id="ssd-title">Small sample sizes detected</h3>
+    <p id="ssd-msg"></p>
+    <ul id="ssd-list"></ul>
+    <p class="ssd-note">Statistical tests are unreliable below n=10. You can exclude these categories from the analysis, include them anyway, or cancel.</p>
+    <div class="dialog-actions">
+      <button id="ssd-exclude">Exclude small categories and run</button>
+      <button id="ssd-include" class="btn-secondary">Include all and run anyway</button>
+      <button id="ssd-cancel" class="btn-ghost">Cancel</button>
+    </div>
+  </dialog>
+
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
   <script src="app.js"></script>
