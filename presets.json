@@ -1,0 +1,60 @@
+{
+  "presets": [
+    {
+      "id": "agree-5",
+      "name": "5pt bipolar agree-disagree",
+      "scale": 5,
+      "polarity": "bipolar",
+      "labels": {
+        "1": ["strongly disagree"],
+        "2": ["disagree", "somewhat disagree"],
+        "3": ["neither agree nor disagree", "neutral", "neither"],
+        "4": ["agree", "somewhat agree"],
+        "5": ["strongly agree"]
+      }
+    },
+    {
+      "id": "intensity-5",
+      "name": "5pt unipolar intensity",
+      "scale": 5,
+      "polarity": "unipolar",
+      "labels": {
+        "1": ["not at all"],
+        "2": ["slightly", "a little"],
+        "3": ["moderately", "somewhat"],
+        "4": ["very", "very much"],
+        "5": ["extremely"]
+      }
+    },
+    {
+      "id": "agree-7",
+      "name": "7pt bipolar agree-disagree",
+      "scale": 7,
+      "polarity": "bipolar",
+      "labels": {
+        "1": ["strongly disagree"],
+        "2": ["disagree"],
+        "3": ["somewhat disagree", "slightly disagree"],
+        "4": ["neither agree nor disagree", "neutral"],
+        "5": ["somewhat agree", "slightly agree"],
+        "6": ["agree"],
+        "7": ["strongly agree"]
+      }
+    },
+    {
+      "id": "intensity-7",
+      "name": "7pt unipolar intensity",
+      "scale": 7,
+      "polarity": "unipolar",
+      "labels": {
+        "1": ["not at all"],
+        "2": ["slightly", "a little"],
+        "3": ["somewhat", "a bit"],
+        "4": ["moderately"],
+        "5": ["quite", "quite a bit"],
+        "6": ["very", "very much"],
+        "7": ["extremely"]
+      }
+    }
+  ]
+}

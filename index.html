@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Survey Lab</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>Survey Lab</h1>
+    <p class="subtitle">Analyze Likert and categorical survey data. Everything runs in your browser — your CSV never leaves this machine.</p>
+  </header>
+
+  <main>
+    <section id="upload-section">
+      <h2>1. Upload CSV</h2>
+      <input type="file" id="csv-input" accept=".csv,text/csv">
+    </section>
+
+    <section id="preview-section" hidden>
+      <h2>2. Preview</h2>
+      <p id="preview-meta"></p>
+      <div id="preview-table" class="scroll-x"></div>
+    </section>
+
+    <section id="columns-section" hidden>
+      <h2>3. Column types</h2>
+      <p>Mark each column. Rating columns get cleaned and analyzed; categorical columns can be used as groups; respondent ID is needed for paired comparisons.</p>
+      <div id="column-controls"></div>
+    </section>
+
+    <section id="cleaning-section" hidden>
+      <h2>4. Clean rating values</h2>
+      <p>For each rating column, pick the scale that matches it. The tool maps text responses to numbers automatically — review and correct anything flagged in red.</p>
+      <div id="cleaning-controls"></div>
+    </section>
+
+    <section id="comparison-section" hidden>
+      <h2>5. Choose comparison</h2>
+      <div class="comparison-controls">
+        <label class="block-label">Comparison type:
+          <select id="comparison-type">
+            <option value="between-groups">Between groups (independent)</option>
+            <option value="pre-post">Pre/post paired</option>
+            <option value="between-questions">Between two questions (paired)</option>
+            <option value="benchmark">Versus a benchmark value</option>
+          </select>
+        </label>
+        <div id="comparison-pickers"></div>
+        <div class="actions">
+          <button id="run-analysis">Run analysis</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="results-section" hidden>
+      <h2>6. Results</h2>
+      <div id="results"></div>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
