@@ -26,13 +26,89 @@
 
     <section id="columns-section" hidden>
       <h2>3. Column types</h2>
-      <p>Mark each column. Rating columns get cleaned and analyzed; categorical columns can be used as groups; respondent ID is needed for paired comparisons.</p>
+      <p>Mark the columns to analyze. Rating columns get cleaned and analyzed; categorical columns can be used as groups; respondent ID is needed for paired comparisons.</p>
       <div id="column-controls"></div>
     </section>
 
     <section id="cleaning-section" hidden>
       <h2>4. Clean rating values</h2>
       <p>For each rating column, pick the scale that matches it. Review and correct anything flagged in red.</p>
+      <details class="scale-guide">
+        <summary>Not sure which scale type to pick? Show guide</summary>
+        <div class="scale-guide-body">
+
+          <div class="scale-section">
+            <h3 class="scale-section-title">Unipolar</h3>
+            <p class="hint">One direction — measures how much of something</p>
+            <svg xmlns="http://www.w3.org/2000/svg" width="100%" viewBox="0 0 680 80" aria-hidden="true" class="scale-diagram">
+              <defs>
+                <marker id="arrow-uni" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                  <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </marker>
+              </defs>
+              <g class="c-teal"><circle cx="80"  cy="36" r="22" stroke-width="0.5" opacity="0.15"/></g>
+              <g class="c-teal"><circle cx="170" cy="36" r="22" stroke-width="0.5" opacity="0.30"/></g>
+              <g class="c-teal"><circle cx="260" cy="36" r="22" stroke-width="0.5" opacity="0.45"/></g>
+              <g class="c-teal"><circle cx="350" cy="36" r="22" stroke-width="0.5" opacity="0.60"/></g>
+              <g class="c-teal"><circle cx="440" cy="36" r="22" stroke-width="0.5" opacity="0.75"/></g>
+              <g class="c-teal"><circle cx="530" cy="36" r="22" stroke-width="0.5" opacity="0.88"/></g>
+              <g class="c-teal"><circle cx="620" cy="36" r="22" stroke-width="0.5" opacity="1.0"/></g>
+              <text class="sd-num" x="80"  y="36" text-anchor="middle" dominant-baseline="central">1</text>
+              <text class="sd-num" x="170" y="36" text-anchor="middle" dominant-baseline="central">2</text>
+              <text class="sd-num" x="260" y="36" text-anchor="middle" dominant-baseline="central">3</text>
+              <text class="sd-num" x="350" y="36" text-anchor="middle" dominant-baseline="central">4</text>
+              <text class="sd-num" x="440" y="36" text-anchor="middle" dominant-baseline="central">5</text>
+              <text class="sd-num" x="530" y="36" text-anchor="middle" dominant-baseline="central">6</text>
+              <text class="sd-num" x="620" y="36" text-anchor="middle" dominant-baseline="central">7</text>
+              <line x1="60" y1="68" x2="636" y2="68" class="arrow-teal" marker-end="url(#arrow-uni)"/>
+            </svg>
+            <div class="scale-point-labels">
+              <span>Not at all</span>
+              <span>Extremely</span>
+            </div>
+            <p class="hint scale-direction-label">More of the thing →</p>
+          </div>
+
+          <hr class="scale-section-divider">
+
+          <div class="scale-section">
+            <h3 class="scale-section-title">Bipolar</h3>
+            <p class="hint">Two directions — measures which side of neutral, and how far</p>
+            <svg xmlns="http://www.w3.org/2000/svg" width="100%" viewBox="0 0 680 80" aria-hidden="true" class="scale-diagram">
+              <defs>
+                <marker id="arrow-bi" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                  <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </marker>
+              </defs>
+              <g class="c-coral"><circle cx="80"  cy="36" r="22" stroke-width="0.5" opacity="1.0"/></g>
+              <g class="c-coral"><circle cx="170" cy="36" r="22" stroke-width="0.5" opacity="0.7"/></g>
+              <g class="c-coral"><circle cx="260" cy="36" r="22" stroke-width="0.5" opacity="0.4"/></g>
+              <g class="c-gray"><circle  cx="350" cy="36" r="22" stroke-width="0.8"/></g>
+              <g class="c-teal"><circle  cx="440" cy="36" r="22" stroke-width="0.5" opacity="0.4"/></g>
+              <g class="c-teal"><circle  cx="530" cy="36" r="22" stroke-width="0.5" opacity="0.7"/></g>
+              <g class="c-teal"><circle  cx="620" cy="36" r="22" stroke-width="0.5" opacity="1.0"/></g>
+              <text class="sd-num" x="80"  y="36" text-anchor="middle" dominant-baseline="central">1</text>
+              <text class="sd-num" x="170" y="36" text-anchor="middle" dominant-baseline="central">2</text>
+              <text class="sd-num" x="260" y="36" text-anchor="middle" dominant-baseline="central">3</text>
+              <text class="sd-num" x="350" y="36" text-anchor="middle" dominant-baseline="central">4</text>
+              <text class="sd-num" x="440" y="36" text-anchor="middle" dominant-baseline="central">5</text>
+              <text class="sd-num" x="530" y="36" text-anchor="middle" dominant-baseline="central">6</text>
+              <text class="sd-num" x="620" y="36" text-anchor="middle" dominant-baseline="central">7</text>
+              <line x1="24" y1="68" x2="636" y2="68" class="arrow-neutral" marker-start="url(#arrow-bi)" marker-end="url(#arrow-bi)"/>
+            </svg>
+            <div class="scale-point-labels scale-point-labels--three">
+              <span>Very negative</span>
+              <span>Neutral</span>
+              <span>Very positive</span>
+            </div>
+            <div class="hint scale-direction-row">
+              <span>← worse</span>
+              <span>better →</span>
+            </div>
+          </div>
+
+        </div>
+      </details>
       <div id="cleaning-controls"></div>
     </section>
 

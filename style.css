@@ -8,7 +8,7 @@ body {
 }
 
 header h1 { margin-bottom: 0.25rem; }
-.subtitle { color: #666; margin-top: 0; }
+.subtitle { margin-top: 0; }
 
 section { margin: 2rem 0; }
 section[hidden] { display: none; }
@@ -197,6 +197,12 @@ button:hover { background: #1d4ed8; }
   color: #666;
   font-size: 0.85rem;
   margin: 0.25rem 0 0;
+}
+
+.hint-inline {
+  color: #666;
+  font-size: 0.85rem;
+  font-weight: normal;
 }
 
 .warning {
@@ -426,4 +432,165 @@ button:disabled {
 .btn-ghost:hover {
   background: #f1f5f9;
   color: #222;
+}
+
+/* ============================================================
+   Scale guide (collapsible reference in step 4)
+   ============================================================ */
+
+.scale-guide {
+  font: inherit;
+  margin: 0.75rem 0 1.25rem;
+  max-width: 1100px;
+}
+
+.scale-guide summary {
+  cursor: pointer;
+  font-size: 0.88rem;
+  color: #2563eb;
+  user-select: none;
+  list-style: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.scale-guide summary::-webkit-details-marker { display: none; }
+
+.scale-guide summary::before {
+  content: '▶';
+  font-size: 0.65em;
+  transition: transform 0.15s;
+}
+
+.scale-guide[open] summary::before {
+  transform: rotate(90deg);
+}
+
+.scale-guide-body {
+  font: inherit;
+  margin-top: 1rem;
+  max-width: 680px;
+}
+
+.scale-section {
+  padding: 0.75rem 0;
+}
+
+.scale-section-title {
+  margin: 0 0 0.15rem;
+  font-size: 1rem;
+}
+
+.scale-guide .scale-diagram {
+  display: block;
+  margin: 0.5rem 0 0.25rem;
+}
+
+/* Labels aligned under the SVG circles (x=80 to x=620 in a 680-wide viewBox) */
+.scale-point-labels {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 8.8% 0 11.8%;
+  font-size: 0.82rem;
+  color: #666;
+}
+
+.scale-point-labels--three {
+  padding: 0 8% 0 10%;
+}
+
+.scale-direction-label {
+  text-align: center;
+  margin: 0.2rem 0 0;
+}
+
+.scale-direction-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.2rem 18% 0;
+  font-size: 0.85rem;
+}
+
+.scale-section-divider {
+  border: none;
+  border-top: 1px dashed #ddd;
+  margin: 0.25rem 0;
+}
+
+/* ============================================================
+   Scale diagram styles
+   ============================================================ */
+
+.scale-diagram {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  --diagram-text-primary:   #222;
+  --diagram-text-secondary: #666;
+  --diagram-border:         rgba(0, 0, 0, 0.15);
+
+  --diagram-teal-50:   #e1f5ee;
+  --diagram-teal-400:  #1d9e75;
+  --diagram-teal-600:  #0f6e56;
+  --diagram-teal-800:  #085041;
+
+  --diagram-coral-50:  #faece7;
+  --diagram-coral-400: #d85a30;
+  --diagram-coral-600: #993c1d;
+  --diagram-coral-800: #712b13;
+
+  --diagram-gray-50:   #f1efe8;
+  --diagram-gray-400:  #888780;
+  --diagram-gray-600:  #5f5e5a;
+}
+
+@media (prefers-color-scheme: dark) {
+  .scale-diagram {
+    --diagram-text-primary:   #e0e0e0;
+    --diagram-text-secondary: #999;
+    --diagram-border:         rgba(255, 255, 255, 0.15);
+  }
+}
+
+.scale-diagram .sd-num {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  fill: var(--diagram-text-primary);
+}
+
+.scale-diagram .c-teal  > circle,
+.scale-diagram .c-teal  > rect {
+  fill:   var(--diagram-teal-400);
+  stroke: var(--diagram-teal-600);
+}
+
+.scale-diagram .c-coral > circle,
+.scale-diagram .c-coral > rect {
+  fill:   var(--diagram-coral-400);
+  stroke: var(--diagram-coral-600);
+}
+
+.scale-diagram .c-gray  > circle,
+.scale-diagram .c-gray  > rect {
+  fill:   var(--diagram-gray-50);
+  stroke: var(--diagram-gray-600);
+}
+
+
+.scale-diagram .arrow-teal {
+  stroke: var(--diagram-teal-600);
+  stroke-width: 1;
+  fill: none;
+}
+
+.scale-diagram .arrow-neutral {
+  stroke: var(--diagram-gray-600);
+  stroke-width: 1;
+  fill: none;
+}
+
+.scale-diagram .divider {
+  stroke: var(--diagram-border);
+  stroke-width: 0.5;
+  stroke-dasharray: 4 4;
 }

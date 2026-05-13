@@ -229,8 +229,6 @@ function renderCleaningCard(col, idx) {
     })
     .join("");
 
-  const blankNote = c.missing ? ` · ${c.missing} blank rows` : "";
-
   return `
     <div class="cleaning-card" data-col-idx="${idx}">
       <div class="card-header">
@@ -239,7 +237,7 @@ function renderCleaningCard(col, idx) {
           <label>Scale:
             <select class="preset-select">${presetOptions}</select>
           </label>
-          <span class="map-status">${mappedCount} of ${c.uniqueValues.length} mapped${blankNote}</span>
+          <span class="map-status">${mappedCount} of ${c.uniqueValues.length} mapped</span>
         </div>
       </div>
       <table class="mapping-table">
@@ -279,9 +277,8 @@ function updateMapStatus(col, idx) {
   if (!card) return;
   const c = state.cleaning[col];
   const mapped = c.uniqueValues.filter((v) => c.mappings[v] != null).length;
-  const blankNote = c.missing ? ` · ${c.missing} blank rows` : "";
   card.querySelector(".map-status").textContent =
-    `${mapped} of ${c.uniqueValues.length} mapped${blankNote}`;
+    `${mapped} of ${c.uniqueValues.length} mapped`;
   card.querySelectorAll("tbody tr").forEach((tr, i) => {
     const v = c.uniqueValues[i];
     tr.classList.toggle("unmapped", c.mappings[v] == null);
@@ -321,6 +318,9 @@ function renderComparisonPickers() {
       <label class="block-label">Group column:
         <select id="cmp-group">${optionList(catCols)}</select>
       </label>
+      <label class="block-label">Second group column (optional):
+        <select id="cmp-group2"><option value="">(none)</option>${optionList(catCols)}</select>
+      </label>
       <p class="hint">Each row is one independent respondent. Don't use this for repeated measures on the same people.</p>
     `;
   } else if (type === "pre-post" || type === "between-questions") {
@@ -346,7 +346,7 @@ function renderComparisonPickers() {
       <label class="block-label">Benchmark value:
         <input type="number" id="cmp-benchmark" step="0.01" value="4">
       </label>
-      <p class="hint">Tests whether the column mean differs from this fixed value.</p>
+      <p class="hint">Tests whether the sample differs from this fixed value. The t-test compares the mean; the Wilcoxon compares the median.</p>
     `;
   }
 
@@ -546,8 +546,8 @@ function renderInterpretation(payload, result) {
       <h3>What does this mean?</h3>
       ${body}
       <div class="prompt-row">
-        <button class="copy-prompt" type="button">Copy explanation prompt for ChatGPT / Claude</button>
-        <span class="hint">Pastes a tailored prompt with these numbers into your LLM of choice for a deeper walkthrough.</span>
+        <button class="copy-prompt" type="button">Copy explanation prompt for ChatGPT</button>
+        <span class="hint">Paste a tailored prompt with these numbers into your LLM of choice for a deeper walkthrough.</span>
       </div>
     </div>
   `;
@@ -563,8 +563,24 @@ function getPrimaryTests(result) {
   return { ordinal, parametric, primary: ordinal || parametric };
 }
 
-function effectMagnitudeLabel(d) {
-  const m = Math.abs(d);
+function effectMagnitudeLabel(value, effectName) {
+  const m = Math.abs(value);
+  const name = (effectName || "").toLowerCase();
+  if (name.includes("eta") || name.includes("epsilon") || name.includes("omega")) {
+    // Thresholds for variance-explained measures (eta-squared, epsilon-squared, omega-squared)
+    if (m < 0.01) return "trivially small";
+    if (m < 0.06) return "small";
+    if (m < 0.14) return "medium";
+    return "large";
+  }
+  if (name.includes("biserial")) {
+    // Rank-biserial r is bounded [-1, 1] like a correlation; use correlation thresholds
+    if (m < 0.1) return "trivially small";
+    if (m < 0.3) return "small";
+    if (m < 0.5) return "medium";
+    return "large";
+  }
+  // Cohen's d / d_z thresholds
   if (m < 0.2) return "trivially small";
   if (m < 0.5) return "small";
   if (m < 0.8) return "medium";
@@ -575,7 +591,8 @@ function interpretBetweenGroups(payload, result) {
   const { primary, parametric } = getPrimaryTests(result);
   if (!primary) return "";
   const p = primary.p;
-  const d = parametric?.effect?.value ?? 0;
+  const effectValue = parametric?.effect?.value ?? 0;
+  const effectName = parametric?.effect?.name ?? "Cohen's d";
   const groups = result.groups.filter((g) => g.n != null && g.n > 0);
   const ns = groups.map((g) => g.n);
   const minN = ns.length ? Math.min(...ns) : 0;
@@ -601,16 +618,17 @@ function interpretBetweenGroups(payload, result) {
     p < 0.05
       ? `<strong>statistically significant</strong> (p = ${formatP(p)})`
       : `<strong>not statistically significant</strong> (p = ${formatP(p)})`;
-  const effectLabel = effectMagnitudeLabel(d);
+  const effectLabel = effectMagnitudeLabel(effectValue, effectName);
   parts.push(
-    `<p>This difference is ${sigPhrase}, with a <strong>${effectLabel}</strong> effect size (Cohen's d = ${d.toFixed(2)}).</p>`
+    `<p>This difference is ${sigPhrase}, with a <strong>${effectLabel}</strong> effect size (${escapeHtml(effectName)} = ${effectValue.toFixed(2)}).</p>`
   );
 
-  if (p < 0.05 && Math.abs(d) < 0.2 && totalN > 500) {
+  const isSmallEffect = effectMagnitudeLabel(effectValue, effectName) === "trivially small";
+  if (p < 0.05 && isSmallEffect && totalN > 500) {
     parts.push(
-      `<p class="callout"><strong>Big-sample caveat:</strong> with ${totalN.toLocaleString()} total responses, even tiny differences register as "significant." A small p-value here means the difference is real, not random — but it doesn't mean the difference is <em>meaningful</em>. Decide whether a ${Math.abs(d).toFixed(2)}-SD shift matters for the decision you're making, not whether p &lt; 0.05.</p>`
+      `<p class="callout"><strong>Big-sample caveat:</strong> with ${totalN.toLocaleString()} total responses, even tiny differences register as "significant." A small p-value here means the difference is real, not random — but it doesn't mean the difference is <em>meaningful</em>. Decide whether a ${escapeHtml(effectName)} of ${effectValue.toFixed(2)} matters for the decision you're making, not whether p &lt; 0.05.</p>`
     );
-  } else if (p < 0.05 && minN < 30 && Math.abs(d) > 0.5) {
+  } else if (p < 0.05 && minN < 30 && !isSmallEffect) {
     parts.push(
       `<p class="callout"><strong>Small-sample caveat:</strong> the smallest group has only n=${minN}. Significant results from small samples can be unstable — a different sample of the same population might give a noticeably different effect size.</p>`
     );
@@ -648,7 +666,7 @@ function interpretPaired(payload, result) {
     p < 0.05
       ? `<strong>statistically significant</strong> (p = ${formatP(p)})`
       : `<strong>not statistically significant</strong> (p = ${formatP(p)})`;
-  const effectLabel = effectMagnitudeLabel(dz);
+  const effectLabel = effectMagnitudeLabel(dz, "Cohen's d_z");
   parts.push(
     `<p>This change is ${sigPhrase}, with a <strong>${effectLabel}</strong> effect size (Cohen's d_z = ${dz.toFixed(2)}).</p>`
   );
@@ -714,7 +732,10 @@ function buildLLMPrompt(payload, result) {
   lines.push(`- Scale type: ${scaleInfo.scale}-point ${scaleInfo.polarity} scale`);
   lines.push(`- Comparison type: ${payload.type}`);
   if (payload.type === "between-groups") {
-    lines.push(`- Comparing rating column "${payload.ratingCol}" across groups in "${payload.groupCol}"`);
+    const groupDesc = payload.groupCol2
+      ? `"${payload.groupCol}" × "${payload.groupCol2}"`
+      : `"${payload.groupCol}"`;
+    lines.push(`- Comparing rating column "${payload.ratingCol}" across groups in ${groupDesc}`);
   } else if (payload.type === "pre-post") {
     lines.push(`- Paired pre/post: "${payload.colA}" vs "${payload.colB}" (same respondents)`);
   } else if (payload.type === "between-questions") {
@@ -747,7 +768,7 @@ function buildLLMPrompt(payload, result) {
   lines.push("Please answer:");
   lines.push("1. In one or two sentences, what is the headline finding?");
   lines.push(
-    "2. Is the difference practically meaningful, or is it statistical noise registering as 'significant' because the sample is large? (Specifically: how does the effect size compare to the p-value?)"
+    "2. Is the difference practically meaningful? (Specifically: how does the effect size compare to the p-value?)"
   );
   lines.push("3. How should I describe this to stakeholders?");
   lines.push("4. What caveats or limitations should I flag?");
@@ -936,12 +957,14 @@ function renderBarChart(payload, result, scaleInfo, divId) {
     customdata: groups.map((g) => g.n),
   };
 
+  const hasCompositeLabels = payload.groupCol2 != null;
   const layout = {
     yaxis: {
       title: "Mean rating",
       range: [Math.max(0.5, 1 - 0.5), scaleInfo.scale + 0.5],
     },
-    margin: { t: 20, r: 20, l: 60, b: 80 },
+    xaxis: hasCompositeLabels ? { tickangle: -30 } : {},
+    margin: { t: 20, r: 20, l: 60, b: hasCompositeLabels ? 120 : 80 },
     showlegend: false,
   };
 
@@ -1105,7 +1128,10 @@ function unipolarColors(scale) {
 
 function describeComparison(payload) {
   if (payload.type === "between-groups") {
-    return `Comparing <strong>${escapeHtml(payload.ratingCol)}</strong> across groups in <strong>${escapeHtml(payload.groupCol)}</strong>.`;
+    const groupDesc = payload.groupCol2
+      ? `<strong>${escapeHtml(payload.groupCol)}</strong> × <strong>${escapeHtml(payload.groupCol2)}</strong>`
+      : `<strong>${escapeHtml(payload.groupCol)}</strong>`;
+    return `Comparing <strong>${escapeHtml(payload.ratingCol)}</strong> across groups in ${groupDesc}.`;
   }
   if (payload.type === "pre-post") {
     return `Pre/post paired comparison: <strong>${escapeHtml(payload.colA)}</strong> vs <strong>${escapeHtml(payload.colB)}</strong>.`;
@@ -1154,13 +1180,20 @@ function buildAnalysisPayload() {
       alert("Pick a rating column and a group column.");
       return null;
     }
+    const rawGroupCol2 = $("cmp-group2")?.value || "";
+    const groupCol2 = rawGroupCol2 && rawGroupCol2 !== groupCol ? rawGroupCol2 : null;
     const ratingVals = getCleanedColumn(ratingCol);
     const groups = {};
     for (let i = 0; i < state.rows.length; i++) {
       const r = ratingVals[i];
-      const g = state.rows[i][groupCol];
-      if (r == null || g == null || String(g).trim() === "") continue;
-      const key = String(g);
+      const g1 = state.rows[i][groupCol];
+      if (r == null || g1 == null || String(g1).trim() === "") continue;
+      let key = String(g1);
+      if (groupCol2) {
+        const g2 = state.rows[i][groupCol2];
+        if (g2 == null || String(g2).trim() === "") continue;
+        key = `${key} | ${String(g2)}`;
+      }
       (groups[key] ||= []).push(r);
     }
     return {
@@ -1168,6 +1201,7 @@ function buildAnalysisPayload() {
       preset: state.cleaning[ratingCol].presetId,
       ratingCol,
       groupCol,
+      groupCol2: groupCol2 ?? null,
       groups,
     };
   }

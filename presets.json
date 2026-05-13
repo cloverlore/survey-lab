@@ -2,7 +2,7 @@
   "presets": [
     {
       "id": "agree-5",
-      "name": "5pt bipolar agree-disagree",
+      "name": "5pt bipolar",
       "scale": 5,
       "polarity": "bipolar",
       "labels": {
@@ -15,7 +15,7 @@
     },
     {
       "id": "intensity-5",
-      "name": "5pt unipolar intensity",
+      "name": "5pt Unipolar",
       "scale": 5,
       "polarity": "unipolar",
       "labels": {
@@ -28,7 +28,7 @@
     },
     {
       "id": "agree-7",
-      "name": "7pt bipolar agree-disagree",
+      "name": "7pt Bipolar",
       "scale": 7,
       "polarity": "bipolar",
       "labels": {
@@ -43,7 +43,7 @@
     },
     {
       "id": "intensity-7",
-      "name": "7pt unipolar intensity",
+      "name": "7pt Unipolar",
       "scale": 7,
       "polarity": "unipolar",
       "labels": {

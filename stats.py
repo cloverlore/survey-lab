@@ -71,10 +71,13 @@ def eta_squared(arrays):
 
 
 def epsilon_squared(arrays, h_stat):
+    # Bias-corrected formula: (H - k + 1) / (n - k), where k = number of groups.
+    # More accurate than H/(n-1) for small samples with many groups.
+    k = len(arrays)
     n = sum(len(a) for a in arrays)
-    if n <= 1:
+    if n <= k:
         return 0.0
-    return float(h_stat / ((n * n - 1) / (n + 1)))
+    return float((h_stat - k + 1) / (n - k))
 
 
 def summary(label, values):
