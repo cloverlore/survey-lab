@@ -768,7 +768,7 @@ function buildLLMPrompt(payload, result) {
   lines.push("Please answer:");
   lines.push("1. In one or two sentences, what is the headline finding?");
   lines.push(
-    "2. Is the difference practically meaningful? (Specifically: how does the effect size compare to the p-value?)"
+    "2. Explain effect size as practical importance. If eta-squared or epsilon-squared is provided, convert it to an approximate percentage of variation explained, and contrast that with the p-value."
   );
   lines.push("3. How should I describe this to stakeholders?");
   lines.push("4. What caveats or limitations should I flag?");
