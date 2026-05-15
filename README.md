@@ -2,7 +2,9 @@
 
 Analyze Likert and categorical survey data in the browser. No backend, no upload — your CSV stays on your machine.
 
-## Run locally
+**[Use the tool → cloverlore.github.io/survey-lab](https://cloverlore.github.io/survey-lab/)**
+
+## Development — run locally
 
 The simplest path:
 
@@ -19,17 +21,25 @@ v1 complete. Upload a CSV, mark column types, clean rating values against a pres
 ## What it does
 
 - **Comparisons**: between groups (2 or 3+), pre/post paired, between two questions, versus a benchmark value
+- **Cross-tabulation**: between-groups supports an optional second group column, producing composite keys like "USA | Online"
 - **Tests** (run automatically per comparison type):
   - Likert data shows both ordinal and parametric results side-by-side
   - Between groups: Welch's t / Mann-Whitney U (2 groups); ANOVA / Kruskal-Wallis (3+)
   - Paired: paired t-test / Wilcoxon signed-rank
   - Benchmark: one-sample t-test / one-sample Wilcoxon
   - Each test reports stat, p-value, effect size, and 95% CIs on group means
-- **Sample size guardrails**: confirm dialog if any group has n<10; warning banner if any group has n<30
+- **Sample size guardrails**:
+  - Between-groups: dialog offering exclude / include / cancel when any group has n<10
+  - Other comparisons: confirm dialog when n<10
+  - Warning banner when any group has 10 ≤ n < 30
+  - "Big-sample trap" callout when n > 500 with a trivially small effect
+- **Plain-English interpretation**: "What does this mean?" panel summarises the headline finding, effect-size magnitude, and sample-size caveats
+- **LLM prompt export**: one-click copy of a tailored prompt (numbers + guardrails against speculation, pattern-matching, and unsupported recommendations) for ChatGPT or similar
 - **Charts**:
   - Means with 95% CI error bars (vertical bar chart)
   - Response distribution as horizontal stacked bar — diverging for bipolar presets, standard for unipolar
 - **PNG export**: 1800×1000 per chart
+- **Scale-type guide**: built-in unipolar/bipolar diagram for users picking a preset
 
 ## Not in v1
 
@@ -49,11 +59,9 @@ v1 complete. Upload a CSV, mark column types, clean rating values against a pres
 
 Defined in `presets.json`. Each carries a polarity tag (bipolar/unipolar) that drives the distribution chart layout.
 
-- 5pt agree-disagree (bipolar)
-- 5pt satisfaction (bipolar)
-- 5pt intensity (unipolar)
-- 5pt frequency (unipolar)
-- 7pt agree-disagree (bipolar)
-- 7pt satisfaction (bipolar)
+- 5pt bipolar (agree/disagree — strongly disagree → strongly agree)
+- 5pt unipolar (intensity — not at all → extremely)
+- 7pt bipolar (agree/disagree)
+- 7pt unipolar (intensity)
 
-Adding more is a single-file edit.
+Auto-mapping matches raw values to scale points by label text (case-insensitive, with leading "1- ", "(1) ", etc. prefixes stripped) and by numeric value. Unmapped rows are highlighted in red for manual fix-up. Adding more presets is a single-file edit.
