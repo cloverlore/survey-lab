@@ -774,6 +774,9 @@ function buildLLMPrompt(payload, result) {
   lines.push("4. What caveats or limitations should I flag?");
   lines.push("");
   lines.push("Avoid jargon; if you must use a technical term, define it.");
+  lines.push("No causal speculation in findings. Describe the pattern. Do not propose why it occurred unless the data directly supports it. A peak in orders may reflect order timing, data merge timing, reporting lag, or something else. Report the observation, not a guessed cause.");
+  lines.push("No recommendations without context. Do not suggest fixes for systems, interfaces, or workflows you cannot see. Do not recommend UI or process changes based on assumptions about how the system works.");
+  lines.push("No pattern-matching to common cases. Do not explain findings by reaching for typical industry patterns, common UX issues, or familiar root causes. What is usually true elsewhere is not evidence about this dataset.");
   return lines.join("\n");
 }
 
